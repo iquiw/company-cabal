@@ -4,7 +4,7 @@
 
 (When "^I execute company-cabal-prefix at current point$"
       (lambda ()
-        (setq company-cabal-test-prefix-output (company-cabal-prefix))))
+        (setq company-cabal-test-prefix-output (company-cabal 'prefix))))
 
 (Then "^company-cabal prefix is\\(?: \"\\(.*\\)\"\\|:\\)$"
       (lambda (expected)
