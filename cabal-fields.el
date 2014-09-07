@@ -25,6 +25,7 @@
 
 (defconst company-cabal--buildinfo-fields
   '("buildable"
+    "build-depends"
     "build-tools"
     "cpp-options"
     "cc-options"
