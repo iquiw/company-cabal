@@ -2,7 +2,7 @@
 ;; files in this directory whose names end with "-steps.el" will be
 ;; loaded automatically by Ecukes.
 
-(When "^I execute company-cabal-prefix at current point$"
+(When "^I execute company-cabal prefix command at current point$"
       (lambda ()
         (setq company-cabal-test-prefix-output (company-cabal 'prefix))))
 

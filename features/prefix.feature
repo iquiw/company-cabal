@@ -4,11 +4,11 @@ Feature: company-cabal prefix
 
   Scenario: Top-level package description field prefix
     Given the buffer is empty
-    When I execute company-cabal-prefix at current point
+    When I execute company-cabal prefix command at current point
     Then company-cabal prefix is ""
 
     When I insert "Name"
-    And I execute company-cabal-prefix at current point
+    And I execute company-cabal prefix command at current point
     Then company-cabal prefix is "Name"
 
     Given the buffer is empty
@@ -17,7 +17,7 @@ Feature: company-cabal prefix
     Name: Test01
     Ver
     """
-    And I execute company-cabal-prefix at current point
+    And I execute company-cabal prefix command at current point
     Then company-cabal prefix is "Ver"
 
     Given the buffer is empty
@@ -27,7 +27,7 @@ Feature: company-cabal prefix
     version: 0.0.1
     cabal-ver
     """
-    And I execute company-cabal-prefix at current point
+    And I execute company-cabal prefix command at current point
     Then company-cabal prefix is "cabal-ver"
 
   Scenario: Library field prefix
@@ -40,11 +40,11 @@ Feature: company-cabal prefix
     library
       
     """
-    And I execute company-cabal-prefix at current point
+    And I execute company-cabal prefix command at current point
     Then company-cabal prefix is ""
 
     When I insert "build-dep"
-    And I execute company-cabal-prefix at current point
+    And I execute company-cabal prefix command at current point
     Then company-cabal prefix is "build-dep"
 
     Given the buffer is empty
@@ -54,11 +54,11 @@ Feature: company-cabal prefix
        Build-Depends:   base
        
     """
-    And I execute company-cabal-prefix at current point
+    And I execute company-cabal prefix command at current point
     Then company-cabal prefix is ""
 
     When I insert "Exposed-Dep"
-    And I execute company-cabal-prefix at current point
+    And I execute company-cabal prefix command at current point
     Then company-cabal prefix is "Exposed-Dep"
 
   Scenario: Executable field prefix
@@ -68,7 +68,7 @@ Feature: company-cabal prefix
     executable foo
       
     """
-    And I execute company-cabal-prefix at current point
+    And I execute company-cabal prefix command at current point
     Then company-cabal prefix is ""
 
   Scenario: Prefix after condition
@@ -79,7 +79,7 @@ Feature: company-cabal prefix
       if os(windows)
         b
     """
-    And I execute company-cabal-prefix at current point
+    And I execute company-cabal prefix command at current point
     Then company-cabal prefix is "b"
 
     Given the buffer is empty
@@ -90,7 +90,7 @@ Feature: company-cabal prefix
          build-depends: Win32
          ghc-
     """
-    And I execute company-cabal-prefix at current point
+    And I execute company-cabal prefix command at current point
     Then company-cabal prefix is "ghc-"
 
     Given the buffer is empty
@@ -102,7 +102,7 @@ Feature: company-cabal prefix
        else
          
     """
-    And I execute company-cabal-prefix at current point
+    And I execute company-cabal prefix command at current point
     Then company-cabal prefix is ""
 
   Scenario: Non prefix
@@ -115,5 +115,5 @@ Feature: company-cabal prefix
         build-depends: Win32,
                        
     """
-    And I execute company-cabal-prefix at current point
+    And I execute company-cabal prefix command at current point
     Then company-cabal prefix none
