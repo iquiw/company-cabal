@@ -71,7 +71,7 @@
                               company-cabal--section-field-alist)))))))))
     (all-completions prefix (or fields company-cabal--pkgdescr-fields))))
 
-(defun company-cabal-post-completion (candidate)
+(defun company-cabal-post-completion ()
   "Add colon and space after field inserted."
   (insert ": "))
 
@@ -84,7 +84,7 @@ Provide completion info according to COMMAND and ARG.  IGNORED, not used."
     (interactive (company-begin-backend 'company-cabal))
     (prefix (and (derived-mode-p 'haskell-cabal-mode) (company-cabal-prefix)))
     (candidates (company-cabal-candidates arg))
-    (post-completion (company-cabal-post-completion arg))))
+    (post-completion (company-cabal-post-completion))))
 
 (provide 'company-cabal)
 ;;; company-cabal.el ends here
