@@ -80,8 +80,8 @@
 (defconst company-cabal--section-field-alist
   (list (cons "library" company-cabal--library-fields)
         (cons "executable" company-cabal--executable-fields)
-        (cons "test-sute" company-cabal--testsuite-fields)
-        (cons "benchmark" company-cabal--buildinfo-fields)
+        (cons "test-suite" company-cabal--testsuite-fields)
+        (cons "benchmark" company-cabal--benchmark-fields)
         (cons "flag" company-cabal--flag-fields)
         (cons "source-repository" company-cabal--sourcerepo-fields)))
 
