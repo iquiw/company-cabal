@@ -1,3 +1,6 @@
+;;; company-cabal-fields.el -- cabal field definitions.
+;;; Commentary:
+;;; Code:
 (defconst company-cabal--pkgdescr-fields
   '("name"
     "version"
@@ -85,4 +88,5 @@
         (cons "flag" company-cabal--flag-fields)
         (cons "source-repository" company-cabal--sourcerepo-fields)))
 
-(provide 'cabal-fields)
+(provide 'company-cabal-fields)
+;;; company-cabal-fields.el ends here

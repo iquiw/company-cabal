@@ -28,7 +28,7 @@
 (require 'cl-lib)
 (require 'company)
 
-(require 'cabal-fields)
+(require 'company-cabal-fields)
 
 (defconst company-cabal--section-regexp
   "^\\([[:space:]]*\\)\\([[:word:]]+\\)\\([[:space:]]\\|$\\)")
