@@ -31,10 +31,12 @@ Feature
 =======
 * Field name completion
 
+  | If field name starts with uppercase character, the completion result is capitalized (e.g. "Cabal-Version").
+  | Otherwise, the completion result contains lowercase characters only (e.g. "cabal-version").
+
 
 Note
 ====
-* No support for uppercase field
 * No support for brace layout
 
 

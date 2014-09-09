@@ -60,7 +60,7 @@
   "Provide completion candidates for the given PREFIX."
   (let ((fields
          (save-excursion
-           (goto-char (line-beginning-position))
+           (beginning-of-line)
            (catch 'result
              (while (re-search-backward company-cabal--section-regexp nil t)
                (when (> company-cabal--prefix-offset
@@ -69,10 +69,20 @@
                         (cdr (assoc-string
                               (downcase (match-string-no-properties 2))
                               company-cabal--section-field-alist)))))))))
-    (all-completions prefix (or fields company-cabal--pkgdescr-fields))))
+    (all-completions (downcase prefix)
+                     (or fields company-cabal--pkgdescr-fields))))
 
-(defun company-cabal-post-completion ()
-  "Add colon and space after field inserted."
+(defun company-cabal-post-completion (candidate)
+  "Capitalize candidate if it starts with uppercase character.
+Add colon and space after field inserted."
+  (let ((end (point)) start)
+    (when (save-excursion
+            (backward-char (length candidate))
+            (setq start (point))
+            (let ((case-fold-search nil))
+              (looking-at-p "[[:upper:]]")))
+      (delete-region start end)
+      (insert (mapconcat 'capitalize (split-string candidate "-") "-"))))
   (insert ": "))
 
 ;;;###autoload
@@ -84,7 +94,8 @@ Provide completion info according to COMMAND and ARG.  IGNORED, not used."
     (interactive (company-begin-backend 'company-cabal))
     (prefix (and (derived-mode-p 'haskell-cabal-mode) (company-cabal-prefix)))
     (candidates (company-cabal-candidates arg))
-    (post-completion (company-cabal-post-completion))))
+    (ignore-case 'keep-prefix)
+    (post-completion (company-cabal-post-completion arg))))
 
 (provide 'company-cabal)
 ;;; company-cabal.el ends here
