@@ -50,6 +50,8 @@
       (if (= offset 0) prefix
         (save-excursion
           (forward-line -1)
+          (while (and (not (bobp)) (looking-at-p "^[[:space:]]*$"))
+            (forward-line -1))
           (cond
            ((looking-at company-cabal--section-regexp) prefix)
            ((and (looking-at company-cabal--field-regexp)

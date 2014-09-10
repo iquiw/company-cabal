@@ -61,6 +61,17 @@ Feature: company-cabal prefix
     And I execute company-cabal prefix command at current point
     Then company-cabal prefix is "Exposed-Dep"
 
+    Given the buffer is empty
+    When I insert:
+    """
+    Library
+       Build-Depends:   base
+    
+       Ghc-
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix is "Ghc-"
+
   Scenario: Executable field prefix
     Given the buffer is empty
     When I insert:
