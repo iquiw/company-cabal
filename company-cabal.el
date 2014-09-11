@@ -30,6 +30,16 @@
 
 (require 'company-cabal-fields)
 
+(defgroup company-cabal nil
+  "company-mode back-end for haskell-cabal-mode."
+  :group 'company)
+
+
+(defcustom company-cabal-field-value-offset 21
+  "Specify column offset filled after field name completion.
+Set it to 0 if you want to turn off this behavior."
+  :type 'number)
+
 (defconst company-cabal--section-regexp
   "^\\([[:space:]]*\\)\\([[:word:]]+\\)\\([[:space:]]\\|$\\)")
 
@@ -85,7 +95,11 @@ Add colon and space after field inserted."
               (looking-at-p "[[:upper:]]")))
       (delete-region start end)
       (insert (mapconcat 'capitalize (split-string candidate "-") "-"))))
-  (insert ": "))
+  (insert ": ")
+  (let ((col (+ company-cabal-field-value-offset
+                company-cabal--prefix-offset)))
+    (if (> col (current-column))
+        (move-to-column col t))))
 
 ;;;###autoload
 (defun company-cabal (command &optional arg &rest ignored)
