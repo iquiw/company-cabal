@@ -34,6 +34,7 @@ Feature
   | If field name starts with uppercase character, the completion result is capitalized (e.g. "Cabal-Version").
   | Otherwise, the completion result contains lowercase characters only (e.g. "cabal-version").
 
+* Section name completion
 
 Note
 ====

@@ -82,24 +82,28 @@ Set it to 0 if you want to turn off this behavior."
                               (downcase (match-string-no-properties 2))
                               company-cabal--section-field-alist)))))))))
     (all-completions (downcase prefix)
-                     (or fields company-cabal--pkgdescr-fields))))
+                     (or fields
+                         (append company-cabal--sections
+                                 company-cabal--pkgdescr-fields)))))
 
 (defun company-cabal-post-completion (candidate)
   "Capitalize candidate if it starts with uppercase character.
 Add colon and space after field inserted."
-  (let ((end (point)) start)
-    (when (save-excursion
-            (backward-char (length candidate))
-            (setq start (point))
-            (let ((case-fold-search nil))
-              (looking-at-p "[[:upper:]]")))
-      (delete-region start end)
-      (insert (mapconcat 'capitalize (split-string candidate "-") "-"))))
-  (insert ": ")
-  (let ((col (+ company-cabal-field-value-offset
-                company-cabal--prefix-offset)))
-    (if (> col (current-column))
-        (move-to-column col t))))
+  (cl-case (get-text-property 0 :type candidate)
+    (field
+     (let ((end (point)) start)
+       (when (save-excursion
+               (backward-char (length candidate))
+               (setq start (point))
+               (let ((case-fold-search nil))
+                 (looking-at-p "[[:upper:]]")))
+         (delete-region start end)
+         (insert (mapconcat 'capitalize (split-string candidate "-") "-"))))
+     (insert ": ")
+     (let ((col (+ company-cabal-field-value-offset
+                   company-cabal--prefix-offset)))
+       (if (> col (current-column))
+           (move-to-column col t))))))
 
 ;;;###autoload
 (defun company-cabal (command &optional arg &rest ignored)
