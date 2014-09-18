@@ -1,6 +1,6 @@
-===============
- company-cabal
-===============
+========================
+ company-cabal |travis|
+========================
 
 `Company-mode`_ completion back-end for haskell-cabal-mode.
 
@@ -46,3 +46,5 @@ License
 Licensed under GPL 3+ license.
 
 .. _company-mode: http://company-mode.github.io/
+.. |travis| image:: https://api.travis-ci.org/iquiw/company-cabal.svg?branch=master
+            :target: https://travis-ci.org/iquiw/company-cabal
