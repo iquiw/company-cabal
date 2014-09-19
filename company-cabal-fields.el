@@ -98,5 +98,8 @@
   (mapcar (lambda (cs) (propertize  (car cs) :type 'section))
           company-cabal--section-field-alist))
 
+(defconst company-cabal--build-type-values
+  (mapcar (lambda (x) (propertize x :type 'value))
+          '("Simple" "Configure" "Make" "Custom")))
 (provide 'company-cabal-fields)
 ;;; company-cabal-fields.el ends here

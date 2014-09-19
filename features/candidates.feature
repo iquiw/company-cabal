@@ -68,3 +68,15 @@ Feature company-cabal candidates
     """
     ("type" "location" "module" "branch" "tag" "subdir")
     """
+
+  Scenario: Build-type candidates
+    Given the buffer is empty
+    When I insert:
+    """
+    build-type: 
+    """
+    And I execute company-cabal candidates command at current point
+    Then company-cabal candidates are:
+    """
+    ("Simple" "Configure" "Make" "Custom")
+    """

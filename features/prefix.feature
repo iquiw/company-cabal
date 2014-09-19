@@ -114,6 +114,15 @@ Feature: company-cabal prefix
     And I execute company-cabal prefix command at current point
     Then company-cabal prefix is ""
 
+  Scenario: Build-type prefix
+    Given the buffer is empty
+    When I insert:
+    """
+    build-type: Si
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix is "Si"
+
   Scenario: Non prefix
     Given the buffer is empty
     When I insert:

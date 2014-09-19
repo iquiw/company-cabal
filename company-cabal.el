@@ -49,11 +49,15 @@ Set it to 0 if you want to turn off this behavior."
 (defconst company-cabal--conditional-regexp
   "^\\([[:space:]]*\\)\\(if\\|else\\)[[:space:]]+\\(.*\\)")
 
+(defconst company-cabal--simple-field-regexp
+  (concat company-cabal--field-regexp "[[:space:]]*\\([[:word:]]*\\)"))
+
 (defvar company-cabal--prefix-offset nil)
 
 (defun company-cabal-prefix ()
   "Provide completion prefix at the current point."
-  (when (company-grab "^\\([[:space:]]*\\)\\([[:word:]]*\\)")
+  (cond
+   ((company-grab "^\\([[:space:]]*\\)\\([[:word:]]*\\)")
     (let ((offset (string-width (match-string-no-properties 1)))
           (prefix (match-string-no-properties 2)))
       (setq company-cabal--prefix-offset offset)
@@ -66,25 +70,36 @@ Set it to 0 if you want to turn off this behavior."
            ((looking-at company-cabal--section-regexp) prefix)
            ((and (looking-at company-cabal--field-regexp)
                  (<= offset (string-width (match-string-no-properties 1))))
-            prefix)))))))
+            prefix))))))
+   ((and (company-grab company-cabal--simple-field-regexp)
+         (member (match-string-no-properties 2)
+                 '("build-type")))
+    (match-string-no-properties 3))))
 
 (defun company-cabal-candidates (prefix)
   "Provide completion candidates for the given PREFIX."
-  (let ((fields
-         (save-excursion
-           (beginning-of-line)
-           (catch 'result
-             (while (re-search-backward company-cabal--section-regexp nil t)
-               (when (> company-cabal--prefix-offset
-                        (string-width (match-string-no-properties 1)))
-                 (throw 'result
-                        (cdr (assoc-string
-                              (downcase (match-string-no-properties 2))
-                              company-cabal--section-field-alist)))))))))
-    (all-completions (downcase prefix)
-                     (or fields
-                         (append company-cabal--sections
-                                 company-cabal--pkgdescr-fields)))))
+  (cond
+   ((company-grab company-cabal--simple-field-regexp)
+    (let ((field (match-string-no-properties 2)))
+      (cond
+       ((string= field "build-type")
+        (all-completions prefix company-cabal--build-type-values)))))
+   (t
+    (let ((fields
+           (save-excursion
+             (beginning-of-line)
+             (catch 'result
+               (while (re-search-backward company-cabal--section-regexp nil t)
+                 (when (> company-cabal--prefix-offset
+                          (string-width (match-string-no-properties 1)))
+                   (throw 'result
+                          (cdr (assoc-string
+                                (downcase (match-string-no-properties 2))
+                                company-cabal--section-field-alist)))))))))
+      (all-completions (downcase prefix)
+                       (or fields
+                           (append company-cabal--sections
+                                   company-cabal--pkgdescr-fields)))))))
 
 (defun company-cabal-post-completion (candidate)
   "Capitalize candidate if it starts with uppercase character.
