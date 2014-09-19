@@ -1,6 +1,4 @@
 Feature: company-cabal prefix
-  In order to find completion prefix
-  Emacs user will need this sweet new feature
 
   Scenario: Top-level package description field prefix
     Given the buffer is empty
