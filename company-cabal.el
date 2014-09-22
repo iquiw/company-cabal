@@ -73,7 +73,7 @@ Set it to 0 if you want to turn off this behavior."
             prefix))))))
    ((and (company-grab company-cabal--simple-field-regexp)
          (member (match-string-no-properties 2)
-                 '("build-type")))
+                 '("build-type" "type")))
     (match-string-no-properties 3))))
 
 (defun company-cabal-candidates (prefix)
@@ -81,9 +81,17 @@ Set it to 0 if you want to turn off this behavior."
   (cond
    ((company-grab company-cabal--simple-field-regexp)
     (let ((field (match-string-no-properties 2)))
-      (cond
-       ((string= field "build-type")
-        (all-completions prefix company-cabal--build-type-values)))))
+      (pcase field
+        (`"build-type"
+         (all-completions prefix company-cabal--build-type-values))
+        (`"type"
+         (pcase (company-cabal--find-current-section)
+           (`"benchmark"
+            (all-completions prefix company-cabal--benchmark-type-values))
+           (`"test-suite"
+            (all-completions prefix company-cabal--testsuite-type-values))
+           (`"source-repository"
+            (all-completions prefix company-cabal--sourcerepo-type-values)))))))
    (t
     (let ((fields
            (save-excursion
@@ -119,6 +127,15 @@ Add colon and space after field inserted."
                    company-cabal--prefix-offset)))
        (if (> col (current-column))
            (move-to-column col t))))))
+
+(defun company-cabal--find-current-section ()
+  "Find the current section name."
+  (catch 'result
+    (save-excursion
+      (while (re-search-backward company-cabal--section-regexp nil t)
+        (let ((section (match-string-no-properties 2)))
+          (when (member section company-cabal--sections)
+            (throw 'result section)))))))
 
 ;;;###autoload
 (defun company-cabal (command &optional arg &rest ignored)

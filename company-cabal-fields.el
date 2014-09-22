@@ -101,5 +101,19 @@
 (defconst company-cabal--build-type-values
   (mapcar (lambda (x) (propertize x :type 'value))
           '("Simple" "Configure" "Make" "Custom")))
+
+(defconst company-cabal--benchmark-type-values
+  (mapcar (lambda (x) (propertize x :type 'value))
+          '("exitcode-stdio-1.0")))
+
+(defconst company-cabal--testsuite-type-values
+  (mapcar (lambda (x) (propertize x :type 'value))
+          '("exitcode-stdio-1.0" "detailed-1.0")))
+
+(defconst company-cabal--sourcerepo-type-values
+  (mapcar (lambda (x) (propertize x :type 'value))
+          '("darcs" "git" "svn" "cvs" "mercurial" "hg" "bazaar" "bzr"
+            "arch" "monotone")))
+
 (provide 'company-cabal-fields)
 ;;; company-cabal-fields.el ends here
