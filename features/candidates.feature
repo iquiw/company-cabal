@@ -80,3 +80,51 @@ Feature company-cabal candidates
     """
     ("Simple" "Configure" "Make" "Custom")
     """
+
+  Scenario: Type candidates
+    Given the buffer is empty
+    When I insert:
+    """
+    benchmark bench-foo
+      type: 
+    """
+    And I execute company-cabal candidates command at current point
+    Then company-cabal candidates are:
+    """
+    ("exitcode-stdio-1.0")
+    """
+
+    Given the buffer is empty
+    When I insert:
+    """
+    test-suite test-foo
+      type: 
+    """
+    And I execute company-cabal candidates command at current point
+    Then company-cabal candidates are:
+    """
+    ("exitcode-stdio-1.0" "detailed-1.0")
+    """
+
+    Given the buffer is empty
+    When I insert:
+    """
+    source-repository head
+      branch: master
+      type:   g
+    """
+    And I execute company-cabal candidates command at current point
+    Then company-cabal candidates are:
+    """
+    ("git")
+    """
+
+  Scenario: No candidate
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      type: 
+    """
+    And I execute company-cabal candidates command at current point
+    Then company-cabal candidates are "nil"

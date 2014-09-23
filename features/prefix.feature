@@ -123,7 +123,36 @@ Feature: company-cabal prefix
     And I execute company-cabal prefix command at current point
     Then company-cabal prefix is "Si"
 
-  Scenario: Non prefix
+  Scenario: Type prefix
+    Given the buffer is empty
+    When I insert:
+    """
+    benchmark bench-foo
+      type: e
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix is "e"
+
+    Given the buffer is empty
+    When I insert:
+    """
+    test-suite test-foo
+      type: de
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix is "de"
+
+    Given the buffer is empty
+    When I insert:
+    """
+    source-repository head
+      branch: master
+      type:   gi
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix is "gi"
+
+  Scenario: No prefix
     Given the buffer is empty
     When I insert:
     """
