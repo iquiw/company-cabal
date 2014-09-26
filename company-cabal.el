@@ -72,7 +72,7 @@ Set it to 0 if you want to turn off this behavior."
                  (<= offset (string-width (match-string-no-properties 1))))
             prefix))))))
    ((and (company-grab company-cabal--simple-field-regexp)
-         (member (match-string-no-properties 2)
+         (member (downcase (match-string-no-properties 2))
                  '("build-type" "type")))
     (match-string-no-properties 3))))
 
@@ -80,7 +80,7 @@ Set it to 0 if you want to turn off this behavior."
   "Provide completion candidates for the given PREFIX."
   (cond
    ((company-grab company-cabal--simple-field-regexp)
-    (let ((field (match-string-no-properties 2)))
+    (let ((field (downcase (match-string-no-properties 2))))
       (pcase field
         (`"build-type"
          (all-completions prefix company-cabal--build-type-values))
@@ -135,7 +135,7 @@ Add colon and space after field inserted."
       (while (re-search-backward company-cabal--section-regexp nil t)
         (let ((section (match-string-no-properties 2)))
           (when (member section company-cabal--sections)
-            (throw 'result section)))))))
+            (throw 'result (downcase section))))))))
 
 ;;;###autoload
 (defun company-cabal (command &optional arg &rest ignored)
