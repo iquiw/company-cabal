@@ -50,13 +50,22 @@ Set it to 0 if you want to turn off this behavior."
   "^\\([[:space:]]*\\)\\(if\\|else\\)[[:space:]]+\\(.*\\)")
 
 (defconst company-cabal--simple-field-regexp
-  (concat company-cabal--field-regexp "[[:space:]]*\\([[:word:]]*\\)"))
+  (concat company-cabal--field-regexp "[[:space:]]*\\([^[:space:]]*\\)"))
+
+(defconst company-cabal--list-field-regexp
+  (concat company-cabal--field-regexp
+          "\\(?:[[:space:]\n]+[^[:space:]]+,?\\)*?"
+          "[[:space:]\n]*\\([^[:space:]]*\\)"))
 
 (defvar company-cabal--prefix-offset nil)
 
 (defun company-cabal-prefix ()
   "Provide completion prefix at the current point."
   (cond
+   ((and (company-grab company-cabal--list-field-regexp)
+         (member (downcase (match-string-no-properties 2))
+                 '("hs-source-dirs")))
+    (match-string-no-properties 3))
    ((company-grab "^\\([[:space:]]*\\)\\([[:word:]]*\\)")
     (let ((offset (string-width (match-string-no-properties 1)))
           (prefix (match-string-no-properties 2)))
@@ -73,13 +82,13 @@ Set it to 0 if you want to turn off this behavior."
             prefix))))))
    ((and (company-grab company-cabal--simple-field-regexp)
          (member (downcase (match-string-no-properties 2))
-                 '("build-type" "type")))
+                 '("build-type" "type" "hs-source-dirs")))
     (match-string-no-properties 3))))
 
 (defun company-cabal-candidates (prefix)
   "Provide completion candidates for the given PREFIX."
   (cond
-   ((company-grab company-cabal--simple-field-regexp)
+   ((company-cabal--find-current-field)
     (let ((field (downcase (match-string-no-properties 2))))
       (pcase field
         (`"build-type"
@@ -91,7 +100,9 @@ Set it to 0 if you want to turn off this behavior."
            (`"test-suite"
             (all-completions prefix company-cabal--testsuite-type-values))
            (`"source-repository"
-            (all-completions prefix company-cabal--sourcerepo-type-values)))))))
+            (all-completions prefix company-cabal--sourcerepo-type-values))))
+        (`"hs-source-dirs"
+         (all-completions prefix (company-cabal--get-directories))))))
    (t
     (let ((fields
            (save-excursion
@@ -136,6 +147,26 @@ Add colon and space after field inserted."
         (let ((section (match-string-no-properties 2)))
           (when (member section company-cabal--sections)
             (throw 'result (downcase section))))))))
+
+(defun company-cabal--find-current-field ()
+  "Find the current field name."
+  (catch 'result
+    (save-excursion
+      (let ((ret (forward-line 0)))
+        (while (>= ret 0)
+          (when (looking-at company-cabal--field-regexp)
+            (throw 'result (downcase (match-string-no-properties 2))))
+          (setq ret (forward-line -1)))))))
+
+(defun company-cabal--get-directories ()
+  "Get top-level directories."
+  (let* ((file (buffer-file-name))
+         (dir (or (and file (file-name-directory file)) "."))
+         result)
+    (dolist (f (directory-files ".") result)
+      (when (and (file-directory-p f)
+                 (not (eq (string-to-char f) ?.)))
+        (setq result (cons f result))))))
 
 ;;;###autoload
 (defun company-cabal (command &optional arg &rest ignored)
