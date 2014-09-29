@@ -152,6 +152,54 @@ Feature: company-cabal prefix
     And I execute company-cabal prefix command at current point
     Then company-cabal prefix is "gi"
 
+  Scenario: Hs-source-dirs prefix
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      hs-source-dirs: 
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix is ""
+
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      hs-source-dirs: src, t
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix is "t"
+
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      hs-source-dirs: src t
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix is "t"
+
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      hs-source-dirs: src,
+                      t
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix is "t"
+
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      hs-source-dirs: src
+                      t
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix is "t"
+
   Scenario: No prefix
     Given the buffer is empty
     When I insert:
