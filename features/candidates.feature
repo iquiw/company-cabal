@@ -81,6 +81,16 @@ Feature company-cabal candidates
     ("Simple" "Configure" "Make" "Custom")
     """
 
+  Scenario: After build-type candidates
+    Given the buffer is empty
+    When I insert:
+    """
+    build-type: Simple
+    li
+    """
+    And I execute company-cabal candidates command at current point
+    Then company-cabal candidates contains "license"
+
   Scenario: Type candidates
     Given the buffer is empty
     When I insert:
@@ -117,6 +127,20 @@ Feature company-cabal candidates
     Then company-cabal candidates are:
     """
     ("git")
+    """
+
+  Scenario: After type candidates
+    Given the buffer is empty
+    When I insert:
+    """
+    source-repository head
+      type:   git
+      bra
+    """
+    And I execute company-cabal candidates command at current point
+    Then company-cabal candidates are:
+    """
+    ("branch")
     """
 
   Scenario: No candidate
