@@ -115,6 +115,11 @@ Set it to 0 if you want to turn off this behavior."
                             (append company-cabal--sections
                                     company-cabal--pkgdescr-fields)))))))
 
+(defun company-cabal-annotation (candidate)
+  "Return type property of CANDIDATE as annotation."
+  (let ((type (get-text-property 0 :type candidate)))
+    (and type (symbol-name type))))
+
 (defun company-cabal-post-completion (candidate)
   "Capitalize candidate if it starts with uppercase character.
 Add colon and space after field inserted."
@@ -176,6 +181,7 @@ Provide completion info according to COMMAND and ARG.  IGNORED, not used."
     (prefix (and (derived-mode-p 'haskell-cabal-mode) (company-cabal-prefix)))
     (candidates (company-cabal-candidates arg))
     (ignore-case 'keep-prefix)
+    (annotation (company-cabal-annotation arg))
     (post-completion (company-cabal-post-completion arg))))
 
 (provide 'company-cabal)
