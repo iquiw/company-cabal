@@ -166,7 +166,7 @@ Add colon and space after field inserted."
   (let* ((file (buffer-file-name))
          (dir (or (and file (file-name-directory file)) "."))
          result)
-    (dolist (f (directory-files ".") result)
+    (dolist (f (directory-files dir) result)
       (when (and (file-directory-p f)
                  (not (eq (string-to-char f) ?.)))
         (setq result (cons f result))))))
