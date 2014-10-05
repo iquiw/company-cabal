@@ -62,7 +62,7 @@ Set it to 0 if you want to turn off this behavior."
 (defun company-cabal-prefix ()
   "Provide completion prefix at the current point."
   (cond
-   ((company-grab "^\\([[:space:]]*\\).*")
+   ((looking-back "^\\([[:space:]]*\\).*")
     (let ((offset (string-width (match-string-no-properties 1)))
           (prefix (company-grab-symbol)))
       (setq company-cabal--prefix-offset offset)
@@ -82,12 +82,20 @@ Set it to 0 if you want to turn off this behavior."
 
 (defun company-cabal-candidates (prefix)
   "Provide completion candidates for the given PREFIX."
-  (pcase (company-cabal--find-current-field)
-    ((and `(,offset . ,field)
-          (guard (< offset company-cabal--prefix-offset)))
-     (pcase field
+  (pcase (company-cabal--find-context)
+    (`(section . ,value)
+     (let ((fields
+            (cdr (assoc-string value company-cabal--section-field-alist))))
+       (all-completions (downcase prefix)
+                        (or fields
+                            (append company-cabal--sections
+                                    company-cabal--pkgdescr-fields)))))
+    (`(field . ,value)
+     (pcase value
        (`"build-type"
         (all-completions prefix company-cabal--build-type-values))
+       (`"hs-source-dirs"
+        (all-completions prefix (company-cabal--get-directories)))
        (`"type"
         (pcase (company-cabal--find-current-section)
           (`"benchmark"
@@ -95,25 +103,11 @@ Set it to 0 if you want to turn off this behavior."
           (`"test-suite"
            (all-completions prefix company-cabal--testsuite-type-values))
           (`"source-repository"
-           (all-completions prefix company-cabal--sourcerepo-type-values))))
-       (`"hs-source-dirs"
-        (all-completions prefix (company-cabal--get-directories)))))
-    (_
-     (let ((fields
-            (save-excursion
-              (beginning-of-line)
-              (catch 'result
-                (while (re-search-backward company-cabal--section-regexp nil t)
-                  (when (> company-cabal--prefix-offset
-                           (string-width (match-string-no-properties 1)))
-                    (throw 'result
-                           (cdr (assoc-string
-                                 (downcase (match-string-no-properties 2))
-                                 company-cabal--section-field-alist)))))))))
-       (all-completions (downcase prefix)
-                        (or fields
-                            (append company-cabal--sections
-                                    company-cabal--pkgdescr-fields)))))))
+           (all-completions prefix company-cabal--sourcerepo-type-values))))))
+    (`(top)
+      (all-completions (downcase prefix)
+                       (append company-cabal--sections
+                               company-cabal--pkgdescr-fields)))))
 
 (defun company-cabal-annotation (candidate)
   "Return type property of CANDIDATE as annotation."
@@ -148,18 +142,35 @@ Add colon and space after field inserted."
           (when (member section company-cabal--sections)
             (throw 'result (downcase section))))))))
 
-(defun company-cabal--find-current-field ()
-  "Find the current field name."
+(defun company-cabal--find-parent (offset)
+  "Find the parent field or section.
+This returns the first field or section with less than given OFFSET."
   (catch 'result
-    (save-excursion
-      (forward-line 0)
-      (if (looking-at company-cabal--field-regexp)
-          (throw 'result (cons -1 (downcase (match-string-no-properties 2))))
-        (while (>= (forward-line -1) 0)
-          (when (looking-at company-cabal--field-regexp)
-            (throw 'result
-                   (cons (string-width (match-string-no-properties 1))
-                         (downcase (match-string-no-properties 2))))))))))
+    (let ((ret (forward-line 0)))
+      (while (>= ret 0)
+        (when (and
+               (looking-at "^\\([[:space:]]*\\)\\([[:word:]]+\\)\\(:\\)?")
+               (< (string-width (match-string-no-properties 1)) offset))
+          (throw 'result
+                 (cons (if (match-string 3) 'field 'section)
+                       (downcase (match-string-no-properties 2)))))
+        (setq ret (forward-line -1))))))
+
+(defun company-cabal--find-context ()
+  "Find the completion context at the current point."
+  (save-excursion
+    (cond
+     ((looking-back "^\\([[:space:]]*\\)[^[:space:]]*")
+      (let ((offset (string-width (match-string-no-properties 1))))
+        (if (= offset 0)
+            '(top)
+          (company-cabal--find-parent offset))))
+     ((looking-back company-cabal--simple-field-regexp)
+      (cons 'field (downcase (match-string-no-properties 2))))
+     ((progn (beginning-of-line)
+             (looking-at "^\\([[:space:]]*\\)"))
+      (company-cabal--find-parent
+       (string-width (match-string-no-properties 1)))))))
 
 (defun company-cabal--get-directories ()
   "Get top-level directories."

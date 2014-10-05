@@ -91,6 +91,17 @@ Feature company-cabal candidates
     And I execute company-cabal candidates command at current point
     Then company-cabal candidates contains "license"
 
+    Given the buffer is empty
+    When I insert:
+    """
+    build-type: Simple
+
+    executable foo
+      
+    """
+    And I execute company-cabal candidates command at current point
+    Then company-cabal candidates contains "main-is"
+
   Scenario: Type candidates
     Given the buffer is empty
     When I insert:
