@@ -59,6 +59,8 @@ Set it to 0 if you want to turn off this behavior."
 
 (defvar company-cabal--prefix-offset nil)
 
+(defvar company-cabal--packages nil)
+
 (defun company-cabal-prefix ()
   "Provide completion prefix at the current point."
   (cond
@@ -103,7 +105,9 @@ Set it to 0 if you want to turn off this behavior."
           (`"test-suite"
            (all-completions prefix company-cabal--testsuite-type-values))
           (`"source-repository"
-           (all-completions prefix company-cabal--sourcerepo-type-values))))))
+           (all-completions prefix company-cabal--sourcerepo-type-values))))
+       (`"build-depends"
+        (all-completions prefix (company-cabal--list-packages)))))
     (`(top)
       (all-completions (downcase prefix)
                        (append company-cabal--sections
@@ -181,6 +185,16 @@ This returns the first field or section with less than given OFFSET."
       (when (and (file-directory-p f)
                  (not (eq (string-to-char f) ?.)))
         (setq result (cons f result))))))
+
+(defun company-cabal--list-packages ()
+  "List installed packages via ghc-pkg."
+  (or company-cabal--packages
+      (setq company-cabal--packages
+            (cl-delete-duplicates
+             (split-string
+              (shell-command-to-string
+               "ghc-pkg list --simple-output --names-only"))
+             :test 'string=))))
 
 ;;;###autoload
 (defun company-cabal (command &optional arg &rest ignored)
