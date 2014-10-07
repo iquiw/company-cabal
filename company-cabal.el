@@ -77,9 +77,10 @@ Set it to 0 if you want to turn off this behavior."
            ((looking-at company-cabal--section-regexp) prefix)
            ((and (looking-at company-cabal--field-regexp)
                  (or
-                  (<= offset (string-width (match-string-no-properties 1)))
+                  (>= offset (string-width (match-string-no-properties 1)))
                   (member (match-string-no-properties 2)
-                          '("build-type" "hs-source-dirs" "type"))))
+                          '("build-type" "hs-source-dirs" "type"
+                            "build-depends"))))
             prefix))))))))
 
 (defun company-cabal-candidates (prefix)

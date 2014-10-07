@@ -200,7 +200,16 @@ Feature: company-cabal prefix
     And I execute company-cabal prefix command at current point
     Then company-cabal prefix is "t"
 
-  Scenario: No prefix
+  Scenario: Build-depends prefix
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      build-depends:   base >=4.6 && <4.8, byte
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix is "byte"
+
     Given the buffer is empty
     When I insert:
     """
@@ -211,4 +220,4 @@ Feature: company-cabal prefix
                        
     """
     And I execute company-cabal prefix command at current point
-    Then company-cabal prefix none
+    Then company-cabal prefix is ""
