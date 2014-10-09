@@ -116,8 +116,11 @@ Set it to 0 if you want to turn off this behavior."
 
 (defun company-cabal-annotation (candidate)
   "Return type property of CANDIDATE as annotation."
-  (let ((type (get-text-property 0 :type candidate)))
-    (and type (symbol-name type))))
+  (let ((type (get-text-property 0 :type candidate))
+        (ver (get-text-property 0 :version candidate)))
+    (cond
+     (type (symbol-name type))
+     (ver ver))))
 
 (defun company-cabal-post-completion (candidate)
   "Capitalize candidate if it starts with uppercase character.
@@ -191,11 +194,16 @@ This returns the first field or section with less than given OFFSET."
   "List installed packages via ghc-pkg."
   (or company-cabal--packages
       (setq company-cabal--packages
-            (cl-delete-duplicates
+            (mapcar
+             (lambda (x)
+               (when (string-match "^\\(.+\\)-\\([[:digit:].]+\\)$" x)
+                 (let ((pkg (match-string 1 x))
+                       (ver (match-string 2 x)))
+                   (put-text-property 0 1 :version ver pkg)
+                   pkg)))
              (split-string
               (shell-command-to-string
-               "ghc-pkg list --simple-output --names-only"))
-             :test 'string=))))
+               "ghc-pkg list --simple-output"))))))
 
 ;;;###autoload
 (defun company-cabal (command &optional arg &rest ignored)
