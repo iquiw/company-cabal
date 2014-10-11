@@ -47,6 +47,7 @@
      "other-extensions"
      "extensions"
      "extra-libraries"
+     "extra-ghci-libraries"
      "extra-lib-dirs"
      "includes"
      "install-includes"
@@ -62,7 +63,7 @@
 
 (defconst company-cabal--library-fields
   (append (mapcar (lambda (x) (propertize x :type 'field))
-                  '("exposed-modules" "exposed"))
+                  '("exposed-modules" "exposed" "reexported-modules"))
           company-cabal--buildinfo-fields))
 
 (defconst company-cabal--executable-fields
