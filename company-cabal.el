@@ -64,6 +64,7 @@ Set it to 0 if you want to turn off this behavior."
 (defun company-cabal-prefix ()
   "Provide completion prefix at the current point."
   (cond
+   ((company-cabal--in-comment-p) nil)
    ((looking-back "^\\([[:space:]]*\\).*")
     (let ((offset (string-width (match-string-no-properties 1)))
           (prefix (company-grab-symbol)))
@@ -204,6 +205,12 @@ This returns the first field or section with less than given OFFSET."
              (split-string
               (shell-command-to-string
                "ghc-pkg list --simple-output"))))))
+
+(defun company-cabal--in-comment-p ()
+  "Return whether the current point is in comment or not."
+  (save-excursion
+    (beginning-of-line)
+    (looking-at-p "^[[:space:]]*--")))
 
 ;;;###autoload
 (defun company-cabal (command &optional arg &rest ignored)
