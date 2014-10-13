@@ -57,32 +57,22 @@ Set it to 0 if you want to turn off this behavior."
           "\\(?:[[:space:]]+[^[:space:]]+,?\\)*?" ; no multi-line
           "[[:space:]]*\\([^[:space:]]*\\)"))
 
-(defvar company-cabal--prefix-offset nil)
-
 (defvar company-cabal--packages nil)
 
 (defun company-cabal-prefix ()
   "Provide completion prefix at the current point."
   (cond
    ((company-cabal--in-comment-p) nil)
-   ((looking-back "^\\([[:space:]]*\\).*")
-    (let ((offset (string-width (match-string-no-properties 1)))
+   (t
+    (let ((offset (company-cabal--current-offset))
           (prefix (company-grab-symbol)))
-      (setq company-cabal--prefix-offset offset)
-      (if (= offset 0) prefix
-        (save-excursion
-          (forward-line -1)
-          (while (and (not (bobp)) (looking-at-p "^[[:space:]]*$"))
-            (forward-line -1))
-          (cond
-           ((looking-at company-cabal--section-regexp) prefix)
-           ((and (looking-at company-cabal--field-regexp)
-                 (or
-                  (>= offset (string-width (match-string-no-properties 1)))
-                  (member (match-string-no-properties 2)
-                          '("build-type" "hs-source-dirs" "type"
-                            "build-depends"))))
-            prefix))))))))
+      (pcase (company-cabal--find-context)
+        (`(field . ,value)
+         (when (member value '("build-type" "hs-source-dirs" "type"
+                               "build-depends"))
+           prefix))
+        (`(sectval . ,_) nil)
+        (_ prefix))))))
 
 (defun company-cabal-candidates (prefix)
   "Provide completion candidates for the given PREFIX."
@@ -128,19 +118,20 @@ Set it to 0 if you want to turn off this behavior."
 Add colon and space after field inserted."
   (cl-case (get-text-property 0 :type candidate)
     (field
-     (let ((end (point)) start)
+     (let ((offset (company-cabal--current-offset))
+           (end (point))
+           start)
        (when (save-excursion
                (backward-char (length candidate))
                (setq start (point))
                (let ((case-fold-search nil))
                  (looking-at-p "[[:upper:]]")))
          (delete-region start end)
-         (insert (mapconcat 'capitalize (split-string candidate "-") "-"))))
-     (insert ": ")
-     (let ((col (+ company-cabal-field-value-offset
-                   company-cabal--prefix-offset)))
-       (if (> col (current-column))
-           (move-to-column col t))))))
+         (insert (mapconcat 'capitalize (split-string candidate "-") "-")))
+       (insert ": ")
+       (let ((col (+ company-cabal-field-value-offset offset)))
+         (if (> col (current-column))
+             (move-to-column col t)))))))
 
 (defun company-cabal--find-current-section ()
   "Find the current section name."
@@ -168,18 +159,20 @@ This returns the first field or section with less than given OFFSET."
 (defun company-cabal--find-context ()
   "Find the completion context at the current point."
   (save-excursion
-    (cond
-     ((looking-back "^\\([[:space:]]*\\)[^[:space:]]*")
-      (let ((offset (string-width (match-string-no-properties 1))))
-        (if (= offset 0)
-            '(top)
-          (company-cabal--find-parent offset))))
-     ((looking-back company-cabal--list-field-regexp)
-      (cons 'field (downcase (match-string-no-properties 2))))
-     ((progn (beginning-of-line)
-             (looking-at "^\\([[:space:]]*\\)"))
-      (company-cabal--find-parent
-       (string-width (match-string-no-properties 1)))))))
+    (if (looking-back "^\\([[:space:]]*\\)[^[:space:]]*")
+        (let ((offset (string-width (match-string-no-properties 1))))
+          (if (= offset 0)
+              '(top)
+            (company-cabal--find-parent offset)))
+      (beginning-of-line)
+      (cond
+       ((looking-at company-cabal--section-regexp)
+        (cons 'sectval (downcase (match-string-no-properties 2))))
+       ((looking-at company-cabal--field-regexp)
+        (cons 'field (downcase (match-string-no-properties 2))))
+       ((looking-at "^\\([[:space:]]*\\)")
+        (company-cabal--find-parent
+         (string-width (match-string-no-properties 1))))))))
 
 (defun company-cabal--get-directories ()
   "Get top-level directories."
@@ -211,6 +204,12 @@ This returns the first field or section with less than given OFFSET."
   (save-excursion
     (beginning-of-line)
     (looking-at-p "^[[:space:]]*--")))
+
+(defun company-cabal--current-offset ()
+  "Return the offset value of the current line."
+  (if (looking-back "^\\([[:space:]]*\\).*")
+      (string-width (match-string-no-properties 1))
+    0))
 
 ;;;###autoload
 (defun company-cabal (command &optional arg &rest ignored)

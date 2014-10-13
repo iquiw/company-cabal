@@ -183,6 +183,45 @@ Feature company-cabal candidates
     ("haskell2010" "haskell98")
     """
 
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      build-depends: base >=4.6 && <4.8, h
+    """
+    And I execute company-cabal candidates command at current point
+    Then company-cabal candidates are:
+    """
+    ("haskell2010" "haskell98")
+    """
+
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      build-depends: base >=4.6 && <4.8,
+                     t
+    """
+    And I execute company-cabal candidates command at current point
+    Then company-cabal candidates are:
+    """
+    ("text")
+    """
+
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      build-depends: base >=4.6 && <4.8,
+                     text >=1.1,
+                     d
+    """
+    And I execute company-cabal candidates command at current point
+    Then company-cabal candidates are:
+    """
+    ("directory")
+    """
+
   Scenario: No candidate
     Given the buffer is empty
     When I insert:

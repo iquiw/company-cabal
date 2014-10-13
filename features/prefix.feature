@@ -221,3 +221,40 @@ Feature: company-cabal prefix
     """
     And I execute company-cabal prefix command at current point
     Then company-cabal prefix is ""
+
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      build-depends:   base,
+                       bytestring,
+                       dir
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix is "dir"
+
+  Scenario: No prefix
+    Given the buffer is empty
+    When I insert:
+    """
+    -- l
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix none
+
+    Given the buffer is empty
+    When I insert:
+    """
+    benchmark bench-
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix none
+
+    Given the buffer is empty
+    When I insert:
+    """
+    benchmark bench-foo
+      -- typ
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix none
