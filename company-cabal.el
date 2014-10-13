@@ -54,8 +54,8 @@ Set it to 0 if you want to turn off this behavior."
 
 (defconst company-cabal--list-field-regexp
   (concat company-cabal--field-regexp
-          "\\(?:[[:space:]\n]+[^[:space:]]+,?\\)*?"
-          "[[:space:]\n]*\\([^[:space:]]*\\)"))
+          "\\(?:[[:space:]]+[^[:space:]]+,?\\)*?" ; no multi-line
+          "[[:space:]]*\\([^[:space:]]*\\)"))
 
 (defvar company-cabal--prefix-offset nil)
 
@@ -174,7 +174,7 @@ This returns the first field or section with less than given OFFSET."
         (if (= offset 0)
             '(top)
           (company-cabal--find-parent offset))))
-     ((looking-back company-cabal--simple-field-regexp)
+     ((looking-back company-cabal--list-field-regexp)
       (cons 'field (downcase (match-string-no-properties 2))))
      ((progn (beginning-of-line)
              (looking-at "^\\([[:space:]]*\\)"))

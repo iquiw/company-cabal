@@ -30,3 +30,7 @@
 (Then "^company-cabal candidates contains\\(?: \"\\(.*\\)\"\\|:\\)$"
       (lambda (expected)
         (should (member expected company-cabal-test-candidates-output))))
+
+(Given "^The following packages are installed\\(?::\\)$"
+       (lambda (str)
+         (setq company-cabal--packages (split-string str))))

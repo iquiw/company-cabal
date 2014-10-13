@@ -154,6 +154,35 @@ Feature company-cabal candidates
     ("branch")
     """
 
+  Scenario: Build-depends candidate
+    Given the buffer is empty
+    And the following packages are installed:
+    """
+    Cabal base bytestring directory haskell2010 haskell98 text
+    """
+    When I insert:
+    """
+    library
+      build-depends: b
+    """
+    And I execute company-cabal candidates command at current point
+    Then company-cabal candidates are:
+    """
+    ("base" "bytestring")
+    """
+
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      build-depends: base, h
+    """
+    And I execute company-cabal candidates command at current point
+    Then company-cabal candidates are:
+    """
+    ("haskell2010" "haskell98")
+    """
+
   Scenario: No candidate
     Given the buffer is empty
     When I insert:
