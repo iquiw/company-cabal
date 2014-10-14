@@ -114,24 +114,30 @@ Set it to 0 if you want to turn off this behavior."
      (ver ver))))
 
 (defun company-cabal-post-completion (candidate)
-  "Capitalize candidate if it starts with uppercase character.
-Add colon and space after field inserted."
-  (cl-case (get-text-property 0 :type candidate)
-    (field
-     (let ((offset (company-cabal--current-offset))
-           (end (point))
-           start)
-       (when (save-excursion
-               (backward-char (length candidate))
-               (setq start (point))
-               (let ((case-fold-search nil))
-                 (looking-at-p "[[:upper:]]")))
-         (delete-region start end)
-         (insert (mapconcat 'capitalize (split-string candidate "-") "-")))
-       (insert ": ")
-       (let ((col (+ company-cabal-field-value-offset offset)))
-         (if (> col (current-column))
-             (move-to-column col t)))))))
+  "Append something or modify it after completion according to CANDIDATE.
+If CANDIDATE is field, capitalize candidate if it starts with uppercase
+character.  And append colon and space after field inserted.
+If CANDIDATE is package name, append version constraint after that."
+  (let ((type (get-text-property 0 :type candidate))
+        (ver (get-text-property 0 :version candidate)))
+    (cond
+     ((eq type 'field)
+      (let ((offset (company-cabal--current-offset))
+            (end (point))
+            start)
+        (when (save-excursion
+                (backward-char (length candidate))
+                (setq start (point))
+                (let ((case-fold-search nil))
+                  (looking-at-p "[[:upper:]]")))
+          (delete-region start end)
+          (insert (mapconcat 'capitalize (split-string candidate "-") "-")))
+        (insert ": ")
+        (let ((col (+ company-cabal-field-value-offset offset)))
+          (if (> col (current-column))
+              (move-to-column col t)))))
+     (ver
+      (insert " >= " ver)))))
 
 (defun company-cabal--find-current-section ()
   "Find the current section name."
@@ -175,7 +181,7 @@ This returns the first field or section with less than given OFFSET."
          (string-width (match-string-no-properties 1))))))))
 
 (defun company-cabal--get-directories ()
-  "Get top-level directories."
+  "Get top level directories."
   (let* ((file (buffer-file-name))
          (dir (or (and file (file-name-directory file)) "."))
          result)
