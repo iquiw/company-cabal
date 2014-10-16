@@ -34,11 +34,28 @@
   "company-mode back-end for haskell-cabal-mode."
   :group 'company)
 
-
 (defcustom company-cabal-field-value-offset 21
   "Specify column offset filled after field name completion.
 Set it to 0 if you want to turn off this behavior."
   :type 'number)
+
+(defcustom company-cabal-version-modifier 'company-cabal-version-major-lower
+  "Specify version modifier function for post completion of package name.
+The function takes version string and returns modified version string.
+Post completion is disabled if it is nil."
+  :type 'function)
+
+(defun company-cabal-version-major-eq (ver)
+  "Modify VER x.y.z.w to ' == x.y.*.*'"
+  (pcase (version-to-list ver)
+    (`(,m1 . (,m2 . ,_)) (format " == %d.%d.*" m1 m2))
+    (_ (concat " == " ver))))
+
+(defun company-cabal-version-major-lower (ver)
+  "Modify VER x.y.z.w to ' >= x.y'"
+  (pcase (version-to-list ver)
+    (`(,m1 . (,m2 . ,_)) (format " >= %d.%d" m1 m2))
+    (_ (concat " >= " ver))))
 
 (defconst company-cabal--section-regexp
   "^\\([[:space:]]*\\)\\([[:word:]]+\\)\\([[:space:]]\\|$\\)")
@@ -136,8 +153,8 @@ If CANDIDATE is package name, append version constraint after that."
         (let ((col (+ company-cabal-field-value-offset offset)))
           (if (> col (current-column))
               (move-to-column col t)))))
-     (ver
-      (insert " >= " ver)))))
+     ((and ver company-cabal-version-modifier)
+      (insert (funcall company-cabal-version-modifier ver))))))
 
 (defun company-cabal--find-current-section ()
   "Find the current section name."
