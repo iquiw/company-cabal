@@ -43,7 +43,11 @@ Set it to 0 if you want to turn off this behavior."
   "Specify version modifier function for post completion of package name.
 The function takes version string and returns modified version string.
 Post completion is disabled if it is nil."
-  :type 'function)
+  :type '(choice
+          (const :tag "Off" nil)
+          (const :tag " >= m1.m2" company-cabal-version-major-lower)
+          (const :tag " == m1.m2.*" company-cabal-version-major-eq)
+          (function :tag "version modifier function")))
 
 (defun company-cabal-version-major-eq (ver)
   "Modify VER x.y.z.w to ' == x.y.*.*'"
