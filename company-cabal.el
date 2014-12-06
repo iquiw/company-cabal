@@ -191,7 +191,7 @@ This returns the first field or section with less than given OFFSET."
           (if (= offset 0)
               '(top)
             (company-cabal--find-parent offset)))
-      (beginning-of-line)
+      (forward-line 0)
       (cond
        ((looking-at company-cabal--section-regexp)
         (cons 'sectval (downcase (match-string-no-properties 2))))
@@ -229,7 +229,7 @@ This returns the first field or section with less than given OFFSET."
 (defun company-cabal--in-comment-p ()
   "Return whether the current point is in comment or not."
   (save-excursion
-    (beginning-of-line)
+    (forward-line 0)
     (looking-at-p "^[[:space:]]*--")))
 
 (defun company-cabal--current-offset ()
