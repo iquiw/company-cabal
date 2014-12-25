@@ -17,7 +17,7 @@
 (require 'ert)
 
 (defvar company-cabal-test-prefix-output)
-(defvar company-ghc-test-candidates-output)
+(defvar company-cabal-test-candidates-output)
 
 (Before
  (setq company-cabal-test-prefix-output nil)
