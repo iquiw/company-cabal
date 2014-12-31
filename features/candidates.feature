@@ -53,7 +53,7 @@ Feature company-cabal candidates
     And I execute company-cabal candidates command at current point
     Then company-cabal candidates are:
     """
-    ("description" "default" "manual")
+    ("default" "description" "manual")
     """
 
   Scenario: Source-repoistory candidates
@@ -66,7 +66,7 @@ Feature company-cabal candidates
     And I execute company-cabal candidates command at current point
     Then company-cabal candidates are:
     """
-    ("type" "location" "module" "branch" "tag" "subdir")
+    ("branch" "location" "module" "subdir" "tag" "type")
     """
 
   Scenario: Build-type candidates
