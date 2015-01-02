@@ -79,6 +79,7 @@ Post completion is disabled if it is nil."
           "[[:space:]]*\\([^[:space:]]*\\)"))
 
 (defvar company-cabal--packages nil)
+(make-variable-buffer-local 'company-cabal--packages)
 
 (defun company-cabal-prefix ()
   "Provide completion prefix at the current point."
@@ -222,9 +223,25 @@ This returns the first field or section with less than given OFFSET."
                        (ver (match-string 2 x)))
                    (put-text-property 0 1 :version ver pkg)
                    pkg)))
-             (split-string
-              (shell-command-to-string
-               "ghc-pkg list --simple-output"))))))
+             (company-cabal--get-packages)))))
+
+(defun company-cabal--get-packages ()
+  "Get list of packages in the current cabal project."
+  (let ((pkgdb (company-cabal--get-package-db)))
+    (split-string
+     (shell-command-to-string
+      (concat
+       "ghc-pkg list --simple-output"
+       (if pkgdb (concat " -f " pkgdb) ""))))))
+
+(defun company-cabal--get-package-db ()
+  "Get sandbox package DB directory if any."
+  (when (file-exists-p "cabal.sandbox.config")
+    (with-temp-buffer
+      (insert-file-contents "cabal.sandbox.config")
+      (goto-char (point-min))
+      (when (re-search-forward "^package-db: \\(.*\\)$" nil t)
+        (match-string 1)))))
 
 (defun company-cabal--in-comment-p ()
   "Return whether the current point is in comment or not."
