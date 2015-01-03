@@ -240,7 +240,8 @@ This returns the first field or section with less than given OFFSET."
     (with-temp-buffer
       (insert-file-contents "cabal.sandbox.config")
       (goto-char (point-min))
-      (when (re-search-forward "^package-db: \\(.*\\)$" nil t)
+      (when (re-search-forward
+             "^package-db:[[:space:]]*\\(.*?\\)[[:space:]]*$" nil t)
         (match-string 1)))))
 
 (defun company-cabal--in-comment-p ()
