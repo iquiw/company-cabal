@@ -36,6 +36,13 @@ Feature
 
 * Section name completion
 
+* Some field value completion
+
+  * build-type
+  * hs-source-dirs (current directories)
+  * type
+  * build-depends (`ghc-pkg list`)
+
 Note
 ====
 * No support for brace layout
