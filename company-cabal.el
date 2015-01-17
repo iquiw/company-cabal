@@ -50,13 +50,13 @@ Post completion is disabled if it is nil."
           (function :tag "version modifier function")))
 
 (defun company-cabal-version-major-eq (ver)
-  "Modify VER x.y.z.w to ' == x.y.*.*'"
+  "Modify version string VER: 'x.y.z.w' to ' == x.y.*.*'."
   (pcase (version-to-list ver)
     (`(,m1 . (,m2 . ,_)) (format " == %d.%d.*" m1 m2))
     (_ (concat " == " ver))))
 
 (defun company-cabal-version-major-lower (ver)
-  "Modify VER x.y.z.w to ' >= x.y'"
+  "Modify version string VER: 'x.y.z.w' to ' >= x.y'."
   (pcase (version-to-list ver)
     (`(,m1 . (,m2 . ,_)) (format " >= %d.%d" m1 m2))
     (_ (concat " >= " ver))))
@@ -253,6 +253,8 @@ This returns the first field or section with less than given OFFSET."
         (match-string 1)))))
 
 (defun company-cabal--get-ghc-options ()
+  "Get list of ghc options by ghc --show-options.
+It is supported by ghc version >= 7.8."
   (let ((ver (company-cabal--get-ghc-version)))
     (when (version<= "7.8" ver)
       (or company-cabal--ghc-options
@@ -265,6 +267,7 @@ This returns the first field or section with less than given OFFSET."
                     "ghc" "--show-options")))))))))
 
 (defun company-cabal--get-ghc-version ()
+  "Get version string of ghc command."
   (replace-regexp-in-string
    "[\r\n]*" ""
    (company-cabal--get-process-output "ghc" "--numeric-version")))
