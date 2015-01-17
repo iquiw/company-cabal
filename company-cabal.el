@@ -78,6 +78,7 @@ Post completion is disabled if it is nil."
           "\\(?:[[:space:]]+[^[:space:]]+,?\\)*?" ; no multi-line
           "[[:space:]]*\\([^[:space:]]*\\)"))
 
+(defvar company-cabal--ghc-options nil)
 (defvar company-cabal--packages nil)
 (make-variable-buffer-local 'company-cabal--packages)
 
@@ -86,13 +87,17 @@ Post completion is disabled if it is nil."
   (cond
    ((company-cabal--in-comment-p) nil)
    (t
-    (let ((offset (company-cabal--current-offset))
-          (prefix (company-grab-symbol)))
+    (let ((prefix (company-grab-symbol)))
       (pcase (company-cabal--find-context)
         (`(field . ,value)
-         (when (member value '("build-type" "hs-source-dirs" "type"
-                               "build-depends"))
-           prefix))
+         (cond
+          ((and (or (string= prefix "") (string-match-p "^-" prefix))
+                (member value '("ghc-options" "ghc-prof-options"
+                                "ghc-shared-options")))
+           prefix)
+          ((member value '("build-type" "hs-source-dirs" "type"
+                           "build-depends"))
+           prefix)))
         (`(sectval . ,_) nil)
         (_ prefix))))))
 
@@ -121,7 +126,9 @@ Post completion is disabled if it is nil."
           (`"source-repository"
            (all-completions prefix company-cabal--sourcerepo-type-values))))
        (`"build-depends"
-        (all-completions prefix (company-cabal--list-packages)))))
+        (all-completions prefix (company-cabal--list-packages)))
+       ((or `"ghc-options" `"ghc-prof-options" `"ghc-shared-options")
+        (all-completions prefix (company-cabal--get-ghc-options)))))
     (`(top)
       (all-completions (downcase prefix)
                        (append company-cabal--sections
@@ -229,10 +236,11 @@ This returns the first field or section with less than given OFFSET."
   "Get list of packages in the current cabal project."
   (let ((pkgdb (company-cabal--get-package-db)))
     (split-string
-     (shell-command-to-string
-      (concat
-       "ghc-pkg list --simple-output"
-       (if pkgdb (concat " -f " pkgdb) ""))))))
+     (apply #'company-cabal--get-process-output
+      "ghc-pkg"
+      "list"
+       "--simple-output"
+       (when pkgdb (list " -f " pkgdb))))))
 
 (defun company-cabal--get-package-db ()
   "Get sandbox package DB directory if any."
@@ -243,6 +251,31 @@ This returns the first field or section with less than given OFFSET."
       (when (re-search-forward
              "^package-db:[[:space:]]*\\(.*?\\)[[:space:]]*$" nil t)
         (match-string 1)))))
+
+(defun company-cabal--get-ghc-options ()
+  (let ((ver (company-cabal--get-ghc-version)))
+    (when (version<= "7.8" ver)
+      (or company-cabal--ghc-options
+          (setq company-cabal--ghc-options
+                (cdr
+                 (cl-delete-if
+                  (lambda (x) (string-match-p "^--" x))
+                  (split-string
+                   (company-cabal--get-process-output
+                    "ghc" "--show-options")))))))))
+
+(defun company-cabal--get-ghc-version ()
+  (replace-regexp-in-string
+   "[\r\n]*" ""
+   (company-cabal--get-process-output "ghc" "--numeric-version")))
+
+(defun company-cabal--get-process-output (cmd &rest args)
+  "Return process output of CMD as string.
+It takes optional command line arguments, ARGS."
+  (with-output-to-string
+    (with-current-buffer
+      standard-output
+      (apply #'call-process cmd nil t nil args))))
 
 (defun company-cabal--in-comment-p ()
   "Return whether the current point is in comment or not."

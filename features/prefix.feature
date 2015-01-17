@@ -233,6 +233,90 @@ Feature: company-cabal prefix
     And I execute company-cabal prefix command at current point
     Then company-cabal prefix is "dir"
 
+  Scenario: Ghc-Options prefix
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      ghc-options: 
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix is ""
+
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      ghc-options: -
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix is "-"
+
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      ghc-options: -f
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix is "-f"
+
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      ghc-options: -f a
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix none
+
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      ghc-options: -f a -XM
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix is "-XM"
+
+  Scenario: Ghc-Prof-Options prefix
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      ghc-prof-options: -fwarn-un
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix is "-fwarn-un"
+
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      ghc-prof-options: f
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix none
+
+  Scenario: Ghc-Shared-Options prefix
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      ghc-shared-options: -X
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix is "-X"
+
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      ghc-shared-options: X
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix none
+
   Scenario: No prefix
     Given the buffer is empty
     When I insert:
