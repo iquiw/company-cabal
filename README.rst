@@ -1,6 +1,6 @@
-========================
- company-cabal |travis|
-========================
+================================
+ company-cabal |travis| |melpa|
+================================
 
 `Company-mode`_ completion back-end for haskell-cabal-mode.
 
@@ -11,6 +11,19 @@ Depends
 -------
 * cl-lib
 * `company-mode`_
+
+Setup from MELPA_
+-----------------
+1. Install from `MELPA`_::
+
+     M-x package-install RET company-cabal RET
+
+
+2. Add ``company-cabal`` to ``company-backends`` after loading `company-mode`_.
+
+   .. code:: emacs-lisp
+
+     (add-to-list 'company-backends 'company-cabal)
 
 
 Setup from Git
@@ -45,6 +58,7 @@ Feature
   * hs-source-dirs (current directories)
   * type
 
+
 Note
 ====
 * No support for brace layout
@@ -55,5 +69,8 @@ License
 Licensed under GPL 3+ license.
 
 .. _company-mode: http://company-mode.github.io/
+.. _MELPA: http://melpa.milkbox.net/
 .. |travis| image:: https://api.travis-ci.org/iquiw/company-cabal.svg?branch=master
             :target: https://travis-ci.org/iquiw/company-cabal
+.. |melpa| image:: http://melpa.org/packages/company-cabal-badge.svg
+           :target: http://melpa.org/#/company-cabal
