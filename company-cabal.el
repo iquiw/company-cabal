@@ -4,7 +4,7 @@
 
 ;; Author:    Iku Iwasa <iku.iwasa@gmail.com>
 ;; URL:       https://github.com/iquiw/company-cabal
-;; Version:   0.0.0
+;; Version:   0.0.1
 ;; Package-Requires: ((cl-lib "0.5") (company "0.8.0") (emacs "24"))
 ;; Stability: experimental
 
@@ -255,16 +255,15 @@ This returns the first field or section with less than given OFFSET."
 (defun company-cabal--get-ghc-options ()
   "Get list of ghc options by ghc --show-options.
 It is supported by ghc version >= 7.8."
-  (let ((ver (company-cabal--get-ghc-version)))
-    (when (version<= "7.8" ver)
-      (or company-cabal--ghc-options
-          (setq company-cabal--ghc-options
-                (cdr
-                 (cl-delete-if
-                  (lambda (x) (string-match-p "^--" x))
-                  (split-string
-                   (company-cabal--get-process-output
-                    "ghc" "--show-options")))))))))
+  (or company-cabal--ghc-options
+      (when (version<= "7.8" (company-cabal--get-ghc-version))
+        (setq company-cabal--ghc-options
+              (cdr
+               (cl-delete-if
+                (lambda (x) (string-match-p "^--" x))
+                (split-string
+                 (company-cabal--get-process-output
+                  "ghc" "--show-options"))))))))
 
 (defun company-cabal--get-ghc-version ()
   "Get version string of ghc command."

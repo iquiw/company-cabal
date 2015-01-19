@@ -34,3 +34,7 @@
 (Given "^The following packages are installed\\(?::\\)$"
        (lambda (str)
          (setq company-cabal--packages (split-string str))))
+
+(Given "^The following \\([^[:space:]]*\\) are set\\(?::\\)$"
+       (lambda (var str)
+         (set (intern (concat "company-cabal--" var)) (split-string str))))

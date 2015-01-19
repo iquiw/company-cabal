@@ -154,7 +154,7 @@ Feature company-cabal candidates
     ("branch")
     """
 
-  Scenario: Build-depends candidate
+  Scenario: Build-depends candidates
     Given the buffer is empty
     And the following packages are installed:
     """
@@ -220,6 +220,47 @@ Feature company-cabal candidates
     Then company-cabal candidates are:
     """
     ("directory")
+    """
+
+  Scenario: Ghc-Options candidates
+    Given the buffer is empty
+    And the following ghc-options are set:
+    """
+    -Wall -fasm -fno-warn-missing-signatures -threaded
+    """
+    When I insert:
+    """
+    library
+      ghc-options: -f
+    """
+    And I execute company-cabal candidates command at current point
+    Then company-cabal candidates are:
+    """
+    ("-fasm" "-fno-warn-missing-signatures")
+    """
+
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      ghc-prof-options: -O2 -W
+    """
+    And I execute company-cabal candidates command at current point
+    Then company-cabal candidates are:
+    """
+    ("-Wall")
+    """
+
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      ghc-shared-options: -O2 -
+    """
+    And I execute company-cabal candidates command at current point
+    Then company-cabal candidates are:
+    """
+    ("-Wall" "-fasm" "-fno-warn-missing-signatures" "-threaded")
     """
 
   Scenario: No candidate
