@@ -53,6 +53,8 @@ Feature
 
   * build-depends (``ghc-pkg list``)
   * build-type
+  * default-extensions, extensions, other-extensions
+    (``ghc --supported-extensions``)
   * ghc-options, ghc-prof-options, ghc-shared-options
     (``ghc --show-options`` if ghc version >= 7.8)
   * hs-source-dirs (current directories)

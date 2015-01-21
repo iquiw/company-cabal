@@ -4,7 +4,7 @@
 
 ;; Author:    Iku Iwasa <iku.iwasa@gmail.com>
 ;; URL:       https://github.com/iquiw/company-cabal
-;; Version:   0.0.1
+;; Version:   0.1.0
 ;; Package-Requires: ((cl-lib "0.5") (company "0.8.0") (emacs "24"))
 ;; Stability: experimental
 
@@ -86,6 +86,7 @@ Post completion is disabled if it is nil."
           "[[:space:]]*\\([^[:space:]]*\\)"))
 
 (defvar company-cabal--ghc-options nil)
+(defvar company-cabal--ghc-extensions nil)
 (defvar company-cabal--packages nil)
 (make-variable-buffer-local 'company-cabal--packages)
 
@@ -103,7 +104,9 @@ Post completion is disabled if it is nil."
                                 "ghc-shared-options")))
            prefix)
           ((member value '("build-type" "hs-source-dirs" "type"
-                           "build-depends"))
+                           "build-depends"
+                           "extensions" "default-extensions"
+                           "other-extensions"))
            prefix)))
         (`(sectval . ,_) nil)
         (_ prefix))))))
@@ -135,7 +138,9 @@ Post completion is disabled if it is nil."
        (`"build-depends"
         (all-completions prefix (company-cabal--list-packages)))
        ((or `"ghc-options" `"ghc-prof-options" `"ghc-shared-options")
-        (all-completions prefix (company-cabal--get-ghc-options)))))
+        (all-completions prefix (company-cabal--get-ghc-options)))
+       ((or `"extensions" `"default-extensions" `"other-extensions")
+        (all-completions prefix (company-cabal--get-ghc-extensions)))))
     (`(top)
       (all-completions (downcase prefix)
                        (append company-cabal--sections
@@ -271,6 +276,14 @@ It is supported by ghc version >= 7.8."
                 (split-string
                  (company-cabal--get-process-output
                   "ghc" "--show-options"))))))))
+
+(defun company-cabal--get-ghc-extensions ()
+  "Get list of supported extensions by ghc --supported-extensions."
+  (or company-cabal--ghc-extensions
+      (setq company-cabal--ghc-extensions
+            (split-string
+             (company-cabal--get-process-output
+              "ghc" "--supported-extensions")))))
 
 (defun company-cabal--get-ghc-version ()
   "Get version string of ghc command."

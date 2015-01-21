@@ -263,6 +263,45 @@ Feature company-cabal candidates
     ("-Wall" "-fasm" "-fno-warn-missing-signatures" "-threaded")
     """
 
+  Scenario: Extensions candidates
+    Given the buffer is empty
+    And the following ghc-extensions are set:
+    """
+    CApiFFI CPP BangPatterns QuasiQuotes TemplateHaskell TypeFamilies
+    """
+    When I insert:
+    """
+    library
+      Extensions: C
+    """
+    And I execute company-cabal candidates command at current point
+    Then company-cabal candidates are:
+    """
+    ("CApiFFI" "CPP")
+    """
+
+    When I insert:
+    """
+    library
+      default-extensions: T
+    """
+    And I execute company-cabal candidates command at current point
+    Then company-cabal candidates are:
+    """
+    ("TemplateHaskell" "TypeFamilies")
+    """
+
+    When I insert:
+    """
+    library
+      Other-Extensions: Q
+    """
+    And I execute company-cabal candidates command at current point
+    Then company-cabal candidates are:
+    """
+    ("QuasiQuotes")
+    """
+
   Scenario: No candidate
     Given the buffer is empty
     When I insert:

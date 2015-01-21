@@ -317,6 +317,83 @@ Feature: company-cabal prefix
     And I execute company-cabal prefix command at current point
     Then company-cabal prefix none
 
+  Scenario: Extensions prefix
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      extensions: 
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix is ""
+
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      Extensions: CP
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix is "CP"
+
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      extensions: CPP, Temp
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix is "Temp"
+
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      Extensions: CPP
+                  Temp
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix is "Temp"
+
+  Scenario: Default-Extensions prefix
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      default-extensions: 
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix is ""
+
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      Default-Extensions: BangPatterns, Pat
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix is "Pat"
+
+  Scenario: Other-Extensions prefix
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      Other-Extensions: 
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix is ""
+
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      Other-Extensions: BangPatterns
+                        C
+    """
+    And I execute company-cabal prefix command at current point
+    Then company-cabal prefix is "C"
+
   Scenario: No prefix
     Given the buffer is empty
     When I insert:
