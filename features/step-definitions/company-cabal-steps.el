@@ -6,6 +6,11 @@
       (lambda ()
         (setq company-cabal-test-prefix-output (company-cabal 'prefix))))
 
+(When "^I execute company-cabal post-completion with \"\\(.+\\)\"$"
+      (lambda (str)
+        (company-cabal 'post-completion
+                       (car (member str company-cabal--pkgdescr-fields)))))
+
 (Then "^company-cabal prefix is\\(?: \"\\(.*\\)\"\\|:\\)$"
       (lambda (expected)
         (should (equal company-cabal-test-prefix-output expected))))
