@@ -4,7 +4,7 @@
 
 ;; Author:    Iku Iwasa <iku.iwasa@gmail.com>
 ;; URL:       https://github.com/iquiw/company-cabal
-;; Version:   0.1.0
+;; Version:   0.1.1
 ;; Package-Requires: ((cl-lib "0.5") (company "0.8.0") (emacs "24"))
 ;; Stability: experimental
 
@@ -252,7 +252,7 @@ This returns the first field or section with less than given OFFSET."
       "ghc-pkg"
       "list"
        "--simple-output"
-       (when pkgdb (list " -f " pkgdb))))))
+       (when pkgdb (list "-f" pkgdb))))))
 
 (defun company-cabal--get-package-db ()
   "Get sandbox package DB directory if any."
