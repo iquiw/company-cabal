@@ -197,7 +197,11 @@ This returns the first field or section with less than given OFFSET."
       (while (>= ret 0)
         (when (and
                (looking-at "^\\([[:space:]]*\\)\\([[:word:]]+\\)\\(:\\)?")
-               (< (string-width (match-string-no-properties 1)) offset))
+               (if (member (match-string-no-properties 2) '("if" "else"))
+                   (progn
+                     (setq offset (string-width (match-string-no-properties 1)))
+                     nil)
+                 (< (string-width (match-string-no-properties 1)) offset)))
           (throw 'result
                  (cons (if (match-string 3) 'field 'section)
                        (downcase (match-string-no-properties 2)))))

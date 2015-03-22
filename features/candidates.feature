@@ -10,6 +10,30 @@ Feature company-cabal candidates
     And I execute company-cabal candidates command at current point
     Then company-cabal candidates contains "exposed-modules"
 
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      build-depends: bytestring
+      if os(windows)
+        
+    """
+    And I execute company-cabal candidates command at current point
+    Then company-cabal candidates contains "exposed-modules"
+
+    Given the buffer is empty
+    When I insert:
+    """
+    library
+      ghc-options: -Wall
+      if os(windows)
+        build-depends: Win32
+      else
+        
+    """
+    And I execute company-cabal candidates command at current point
+    Then company-cabal candidates contains "exposed-modules"
+
   Scenario: Executable candidates
     Given the buffer is empty
     When I insert:
