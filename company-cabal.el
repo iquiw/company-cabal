@@ -301,7 +301,16 @@ It takes optional command line arguments, ARGS."
   (with-output-to-string
     (with-current-buffer
       standard-output
+      (when (company-cabal--stack-project-p)
+        (setq args (cons "exec" (cons "--" (cons cmd args))))
+        (setq cmd "stack"))
       (apply #'call-process cmd nil t nil args))))
+
+(defun company-cabal--stack-project-p ()
+  "Return non-nil if the project is built with stack.
+True if \".stack-work\" directory exists and stack command is in PATH."
+  (and (file-directory-p ".stack-work")
+       (executable-find "stack")))
 
 (defun company-cabal--in-comment-p ()
   "Return whether the current point is in comment or not."
