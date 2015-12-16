@@ -4,7 +4,7 @@
 
 ;; Author:    Iku Iwasa <iku.iwasa@gmail.com>
 ;; URL:       https://github.com/iquiw/company-cabal
-;; Version:   0.2.0
+;; Version:   0.2.1
 ;; Package-Requires: ((cl-lib "0.5") (company "0.8.0") (emacs "24"))
 ;; Stability: experimental
 
@@ -151,7 +151,7 @@ Post completion is disabled if it is nil."
   (let ((type (get-text-property 0 :type candidate))
         (ver (get-text-property 0 :version candidate)))
     (cond
-     (type (concat " "(symbol-name type)))
+     (type (concat " " (symbol-name type)))
      (ver  (concat " " ver)))))
 
 (defun company-cabal-post-completion (candidate)
