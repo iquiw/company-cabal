@@ -151,8 +151,8 @@ Post completion is disabled if it is nil."
   (let ((type (get-text-property 0 :type candidate))
         (ver (get-text-property 0 :version candidate)))
     (cond
-     (type (symbol-name type))
-     (ver ver))))
+     (type (concat " "(symbol-name type)))
+     (ver  (concat " " ver)))))
 
 (defun company-cabal-post-completion (candidate)
   "Append something or modify it after completion according to CANDIDATE.
