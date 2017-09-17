@@ -11,19 +11,14 @@ import qualified Data.Text.Lazy.Builder.Int as TB
 import qualified Data.Text.Lazy.IO as LT
 import           Distribution.PackageDescription.Parse
 import           Distribution.Simple.Utils (cabalVersion)
-import           Distribution.Version (Version(..))
+import           Distribution.Version (versionNumbers)
 
 type SectionField = (Text, [Text])
 type FieldValue = (Text, [Text])
 
--- XXX: benchmarkFieldDescrs is not exported.
-benchmarkFields :: [Text]
-benchmarkFields = sort $ [ "type", "main-is" ]
-                  ++ map (T.pack . fieldName) binfoFieldDescrs
-
 sectionFields :: [SectionField]
 sectionFields =
-    [ ("benchmark", benchmarkFields)
+    [ ("benchmark", fields benchmarkFieldDescrs)
     , ("executable", fields executableFieldDescrs)
     , ("flag", fields flagFieldDescrs)
     , ("library", fields libFieldDescrs)
@@ -65,7 +60,7 @@ header = mconcat
     , ";;; Code:\n\n"
     ]
   where
-    version = mconcat . intersperse "." . map TB.decimal . versionBranch
+    version = mconcat . intersperse "." . map TB.decimal . versionNumbers
 
 footer :: Builder
 footer = mconcat

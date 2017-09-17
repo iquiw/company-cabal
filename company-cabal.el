@@ -210,7 +210,7 @@ This returns the first field or section with less than given OFFSET."
 (defun company-cabal--find-context ()
   "Find the completion context at the current point."
   (save-excursion
-    (if (looking-back "^\\([[:space:]]*\\)[^[:space:]]*")
+    (if (looking-back "^\\([[:space:]]*\\)[^[:space:]]*" nil)
         (let ((offset (string-width (match-string-no-properties 1))))
           (if (= offset 0)
               '(top)
@@ -320,7 +320,7 @@ True if \".stack-work\" directory exists and stack command is in PATH."
 
 (defun company-cabal--current-offset ()
   "Return the offset value of the current line."
-  (if (looking-back "^\\([[:space:]]*\\).*")
+  (if (looking-back "^\\([[:space:]]*\\).*" nil)
       (string-width (match-string-no-properties 1))
     0))
 
