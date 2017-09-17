@@ -1,10 +1,10 @@
 ;;; company-cabal.el --- company-mode cabal backend -*- lexical-binding: t -*-
 
-;; Copyright (C) 2014-2015 by Iku Iwasa
+;; Copyright (C) 2014-2017 by Iku Iwasa
 
 ;; Author:    Iku Iwasa <iku.iwasa@gmail.com>
 ;; URL:       https://github.com/iquiw/company-cabal
-;; Version:   0.2.1
+;; Version:   0.3.0
 ;; Package-Requires: ((cl-lib "0.5") (company "0.8.0") (emacs "24"))
 ;; Stability: experimental
 
